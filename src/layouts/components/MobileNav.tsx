@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PlusIcon, SunIcon } from "@/src/components/Icons";
+import { CreatePostDialog } from "@/src/modules/feed/CreatePostDialog";
 import { NAV_ITEMS, type NavItem } from "../nav";
 
 export function MobileNav({ activeItem }: { activeItem: NavItem }) {
@@ -15,9 +16,9 @@ export function MobileNav({ activeItem }: { activeItem: NavItem }) {
           </span>
         </div>
         <div className="flex items-center gap-2.5">
-          <span className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-[linear-gradient(180deg,#F4977E,#EE8164)] text-white">
+          <CreatePostDialog ariaLabel="Nueva publicación" className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-[linear-gradient(180deg,#F4977E,#EE8164)] text-white">
             <PlusIcon size={17} />
-          </span>
+          </CreatePostDialog>
           <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#F2937A] font-display text-sm font-semibold text-white">
             C
           </div>

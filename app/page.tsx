@@ -1,5 +1,6 @@
 import { CameraIcon } from "@/src/components/Icons";
 import { AppShell } from "@/src/layouts/components/AppShell";
+import { CreatePostDialog } from "@/src/modules/feed/CreatePostDialog";
 import { PostCard } from "@/src/modules/feed/PostCard";
 import { POSTS } from "@/src/modules/feed/posts";
 
@@ -19,7 +20,7 @@ export default function Home() {
           </p>
         </header>
 
-        <div className="mb-6 flex items-center gap-3.5 rounded-[18px] border border-line bg-card px-[18px] py-3.5 shadow-composer">
+        <CreatePostDialog className="mb-6 flex w-full cursor-pointer items-center gap-3.5 rounded-[18px] border border-line bg-card px-[18px] py-3.5 text-left shadow-composer">
           <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#F2937A] font-display text-base font-semibold text-white">
             C
           </div>
@@ -29,7 +30,7 @@ export default function Home() {
           <span className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-coral-soft text-coral">
             <CameraIcon />
           </span>
-        </div>
+        </CreatePostDialog>
 
         <div className="mb-3.5 flex items-center gap-3.5">
           <span className="text-[12.5px] font-extrabold tracking-[.8px] text-[#8A7C6D]">

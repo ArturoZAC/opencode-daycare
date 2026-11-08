@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoutIcon, PlusIcon, SunIcon } from "@/src/components/Icons";
+import { CreatePostDialog } from "@/src/modules/feed/CreatePostDialog";
 import { NAV_ITEMS, type NavItem } from "../nav";
 
 export function Sidebar({ activeItem }: { activeItem: NavItem }) {
@@ -17,10 +18,10 @@ export function Sidebar({ activeItem }: { activeItem: NavItem }) {
         </div>
       </div>
 
-      <div className="mb-[18px] flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] p-3 text-[14.5px] font-extrabold text-white shadow-cta">
+      <CreatePostDialog className="mb-[18px] flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] p-3 text-[14.5px] font-extrabold text-white shadow-cta">
         <PlusIcon size={17} />
         Nueva publicación
-      </div>
+      </CreatePostDialog>
 
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ id, label, icon: Icon, href }) => {
