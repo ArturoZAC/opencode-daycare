@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { SearchIcon } from "@/src/components/Icons";
+import { AddChildDialog } from "./AddChildDialog";
 import { KidCard } from "./KidCard";
-import { KIDS } from "./kids";
+import { KIDS, type Child } from "./kids";
+import { listKids } from "./kidsStore";
 
 function normalizeText(value: string) {
   return value
@@ -13,8 +15,13 @@ function normalizeText(value: string) {
 }
 
 export function KidsDirectory() {
+  const [kids, setKids] = useState<Child[]>(KIDS);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    setKids(listKids());
+  }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedQuery(query), 250);
@@ -23,11 +30,27 @@ export function KidsDirectory() {
 
   const normalizedQuery = normalizeText(debouncedQuery.trim());
   const visibleKids = normalizedQuery
-    ? KIDS.filter((kid) => normalizeText(kid.name).includes(normalizedQuery))
-    : KIDS;
+    ? kids.filter((kid) => normalizeText(kid.name).includes(normalizedQuery))
+    : kids;
+
+  function handleChildAdded(child: Child) {
+    setKids((currentKids) => [...currentKids, child]);
+  }
 
   return (
     <>
+      <div className="mb-[22px] flex items-end justify-between gap-4">
+        <div>
+          <div className="mb-1 text-[12.5px] font-extrabold tracking-[.8px] text-[#D9583C]">
+            GESTIÓN
+          </div>
+          <h1 className="font-display text-[30px] font-semibold text-ink">
+            Niños
+          </h1>
+        </div>
+        <AddChildDialog onAdded={handleChildAdded} />
+      </div>
+
       <div className="mb-[22px] flex items-center gap-[11px] rounded-[14px] border border-line bg-card px-4 py-3">
         <span className="flex-none text-[#B0A290]">
           <SearchIcon />

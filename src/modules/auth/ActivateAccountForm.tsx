@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { Field } from "@/src/components/Field";
 import { CheckIcon, SunIcon } from "@/src/components/Icons";
-import { Field } from "./Field";
 
 export function ActivateAccountForm() {
   return (

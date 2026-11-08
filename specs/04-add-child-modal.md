@@ -1,6 +1,6 @@
 # SPEC 04 — Modal Agregar niño
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 02
 > **Date:** 2026-11-08
 > **Objective:** Convertir el CTA "Agregar niño" de `/kids` en un `<dialog>` que valida nombre, fecha de nacimiento y sala, y agrega el niño a la grilla y a su perfil en memoria durante la sesión.
