@@ -37,6 +37,13 @@ Before the final response, run one reporting pass. If candidates remain, from th
 - Alias `@/*` → raíz del repo (`tsconfig.json`). Tipos como `LayoutProps<"/">` y `PageProps` son generados en `.next/types`: no escribirlos a mano.
 - Remote git: `git@github.com-personal:...` (alias SSH, no `github.com` directo). Rama base: `main`.
 
+## Código limpio
+
+- Nombres de variables, funciones, tipos y props en inglés, descriptivos y completos: `publishedPosts`, `likesCount`.
+- Prohibidos los nombres de una o dos letras, también en callbacks y bucles: `event` en vez de `e`, `item` en vez de `i`.
+- Sin abreviaturas opacas: si el nombre necesita contexto para entenderse, no sirve.
+- Funciones cortas, sin duplicación y sin anidamiento innecesario.
+
 ## Cache Components (gotcha de esta versión)
 
 `next.config.ts` habilita `cacheComponents: true` y `partialPrefetching: true`. Consecuencia real: todo acceso a datos dinámicos o APIs de request que no esté bajo `'use cache'` debe ir dentro de `<Suspense>`, o el dev overlay marca `blocking-route`.
