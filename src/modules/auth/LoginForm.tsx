@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Field } from "./Field";
+import { Field } from "@/src/components/Field";
 
 export function LoginForm() {
   return (

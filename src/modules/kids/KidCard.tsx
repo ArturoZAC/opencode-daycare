@@ -29,9 +29,9 @@ export function KidCard({ child }: { child: Child }) {
           {child.ageYears} años · {parentsLabel(child.parents.length)}
         </div>
       </div>
-      {child.allergyTag ? (
+      {child.allergyTags.length > 0 ? (
         <span className="flex-none rounded-full bg-[#FBD8CC] px-[9px] py-[5px] text-[11px] font-extrabold text-[#D9684A]">
-          {child.allergyTag}
+          {child.allergyTags[0].toUpperCase()}
         </span>
       ) : child.parents.length === 0 ? (
         <span className="flex-none rounded-full bg-[#F9D2DE] px-[9px] py-[5px] text-[11px] font-extrabold text-[#C56486]">

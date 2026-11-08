@@ -70,7 +70,7 @@ export function KidProfile({ child }: { child: Child }) {
             </span>
           </div>
 
-          {child.allergyNote ? (
+          {child.allergyTags.length > 0 || child.allergyNote ? (
             <div className="flex gap-3.5 rounded-2xl bg-[#FBDAD6] p-4 md:px-[18px]">
               <div className="flex h-10 w-10 flex-none items-center justify-center rounded-[11px] bg-[#F4A8A0] text-white">
                 <AlertIcon />
@@ -79,9 +79,16 @@ export function KidProfile({ child }: { child: Child }) {
                 <div className="mb-0.5 text-[15px] font-extrabold text-[#C5413A]">
                   Alergias y notas
                 </div>
-                <p className="text-[14px] leading-[1.5] text-[#B25249] md:text-[14.5px]">
-                  {child.allergyNote}
-                </p>
+                {child.allergyTags.length > 0 ? (
+                  <p className="text-[14px] font-extrabold leading-[1.5] text-[#B25249] md:text-[14.5px]">
+                    {child.allergyTags.join(" · ")}
+                  </p>
+                ) : null}
+                {child.allergyNote ? (
+                  <p className="text-[14px] leading-[1.5] text-[#B25249] md:text-[14.5px]">
+                    {child.allergyNote}
+                  </p>
+                ) : null}
               </div>
             </div>
           ) : null}
