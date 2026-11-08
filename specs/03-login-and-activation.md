@@ -1,6 +1,6 @@
 # SPEC 03 — Login y activación de cuenta
 
-> **Status:** Draft
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 02
 > **Date:** 2026-11-08
 > **Objective:** Implementar `references/pantallas/login.dc.html` en `/login` y `references/pantallas/activar-cuenta.dc.html` en `/activate-account`, agrupadas en `app/(auth)` con layout propio y sin shell de la app.
@@ -58,31 +58,31 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 
 ## Acceptance criteria
 
-- [ ] `/login` responde 200 y muestra el panel coral y el formulario.
-- [ ] `/activate-account` responde 200 y muestra la tarjeta centrada de 440px.
-- [ ] Las dos rutas viven en `app/(auth)/` y la URL no incluye `(auth)`.
-- [ ] `/login` y `/activate-account` no renderizan sidebar, top bar ni barra inferior.
-- [ ] El fondo de las dos pantallas es `#FBF4EC`.
-- [ ] `/login` no muestra el bloque "INGRESO COMO" ni los botones Personal / Familia.
-- [ ] `/login` arranca con email y contraseña vacíos.
-- [ ] `h1` de `/login` es "Iniciar sesión"; el titular del panel de marca no es `h1`.
-- [ ] `h1` de `/activate-account` es "Bienvenida a OpenDayCare".
-- [ ] Click en cada label enfoca su input; los 5 campos tienen `id` y `htmlFor`.
-- [ ] Los inputs muestran borde `#F2A78E` al enfocar.
-- [ ] "Iniciar sesión" y "Activar mi cuenta" no navegan ni recargan la página.
-- [ ] "Activá tu cuenta" navega a `/activate-account`.
-- [ ] "Iniciar sesión" del pie de activar cuenta navega a `/login`.
-- [ ] Activar cuenta precarga `7K4P9`, `lucia.fernandez@gmail.com` y `contraseña`.
-- [ ] La tarjeta de invitación muestra "M", "Te invitaron a seguir a" y "Mateo · Sala Soles".
-- [ ] El consentimiento arranca tildado y se puede destildar con click y con Espacio.
-- [ ] Los títulos son "Iniciar sesión — OpenDayCare" y "Activar cuenta — OpenDayCare".
-- [ ] A 390 px: sin panel coral, formulario a ancho completo con padding, sin scroll horizontal.
-- [ ] A 768 px: panel coral oculto y formulario centrado.
-- [ ] A 1024 y 1440 px: dos columnas `1.05fr / 1fr` y el titular no desborda.
-- [ ] `globals.css` no cambia: sigue solo con `@import` y `@theme`.
-- [ ] Ningún archivo nuevo usa `"use client"`.
-- [ ] `package.json` no suma dependencias y no se usa `next/image`.
-- [ ] `/`, `/kids` y `/kids/[slug]` se ven igual que antes.
+- [x] `/login` responde 200 y muestra el panel coral y el formulario.
+- [x] `/activate-account` responde 200 y muestra la tarjeta centrada de 440px.
+- [x] Las dos rutas viven en `app/(auth)/` y la URL no incluye `(auth)`.
+- [x] `/login` y `/activate-account` no renderizan sidebar, top bar ni barra inferior.
+- [x] El fondo de las dos pantallas es `#FBF4EC`.
+- [x] `/login` no muestra el bloque "INGRESO COMO" ni los botones Personal / Familia.
+- [x] `/login` arranca con email y contraseña vacíos.
+- [x] `h1` de `/login` es "Iniciar sesión"; el titular del panel de marca no es `h1`.
+- [x] `h1` de `/activate-account` es "Bienvenida a OpenDayCare".
+- [x] Click en cada label enfoca su input; los 5 campos tienen `id` y `htmlFor`.
+- [x] Los inputs muestran borde `#F2A78E` al enfocar.
+- [x] "Iniciar sesión" y "Activar mi cuenta" no navegan ni recargan la página.
+- [x] "Activá tu cuenta" navega a `/activate-account`.
+- [x] "Iniciar sesión" del pie de activar cuenta navega a `/login`.
+- [x] Activar cuenta precarga `7K4P9`, `lucia.fernandez@gmail.com` y `contraseña`.
+- [x] La tarjeta de invitación muestra "M", "Te invitaron a seguir a" y "Mateo · Sala Soles".
+- [x] El consentimiento arranca tildado y se puede destildar con click y con Espacio.
+- [x] Los títulos son "Iniciar sesión — OpenDayCare" y "Activar cuenta — OpenDayCare".
+- [x] A 390 px: sin panel coral, formulario a ancho completo con padding, sin scroll horizontal.
+- [x] A 768 px: panel coral oculto y formulario centrado.
+- [x] A 1024 y 1440 px: dos columnas `1.05fr / 1fr` y el titular no desborda.
+- [x] `globals.css` no cambia: sigue solo con `@import` y `@theme`.
+- [x] Ningún archivo nuevo usa `"use client"`.
+- [x] `package.json` no suma dependencias y no se usa `next/image`.
+- [x] `/`, `/kids` y `/kids/[slug]` se ven igual que antes.
 
 ## Decisions
 
