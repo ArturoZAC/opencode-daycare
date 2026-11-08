@@ -1,5 +1,10 @@
-import type { Post, PostKind } from "@/src/data/posts";
-import { HeartIcon, ImageIcon, MegaphoneIcon, MessageIcon } from "./Icons";
+import {
+  HeartIcon,
+  ImageIcon,
+  MegaphoneIcon,
+  MessageIcon,
+} from "@/src/components/Icons";
+import type { Post, PostKind } from "./posts";
 
 const KIND_STYLES: Record<
   PostKind,

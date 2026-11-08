@@ -1,20 +1,8 @@
-import {
-  BellIcon,
-  HomeIcon,
-  PlusIcon,
-  SunIcon,
-  UserIcon,
-  UsersIcon,
-} from "./Icons";
+import Link from "next/link";
+import { PlusIcon, SunIcon } from "@/src/components/Icons";
+import { NAV_ITEMS, type NavItem } from "../nav";
 
-const NAV_ITEMS = [
-  { label: "Feed", icon: HomeIcon, active: true },
-  { label: "Niños", icon: UsersIcon, active: false },
-  { label: "Avisos", icon: BellIcon, active: false },
-  { label: "Mi cuenta", icon: UserIcon, active: false },
-];
-
-export function MobileNav() {
+export function MobileNav({ activeItem }: { activeItem: NavItem }) {
   return (
     <>
       <header className="flex items-center justify-between border-b border-line bg-card px-4 py-3 md:hidden">
@@ -37,19 +25,25 @@ export function MobileNav() {
       </header>
 
       <nav className="fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-line bg-card pb-[env(safe-area-inset-bottom)] md:hidden">
-        {NAV_ITEMS.map(({ label, icon: Icon, active }) => (
-          <div
-            key={label}
-            className={`flex flex-col items-center gap-1 py-2 text-[11px] ${
-              active
-                ? "font-extrabold text-coral"
-                : "font-semibold text-[#6E6359]"
-            }`}
-          >
-            <Icon size={20} />
-            {label}
-          </div>
-        ))}
+        {NAV_ITEMS.map(({ id, label, icon: Icon, href }) => {
+          const className = `flex flex-col items-center gap-1 py-2 text-[11px] ${
+            id === activeItem
+              ? "font-extrabold text-coral"
+              : "font-semibold text-[#6E6359]"
+          }`;
+
+          return href ? (
+            <Link key={id} href={href} className={className}>
+              <Icon size={20} />
+              {label}
+            </Link>
+          ) : (
+            <span key={id} className={className}>
+              <Icon size={20} />
+              {label}
+            </span>
+          );
+        })}
       </nav>
     </>
   );

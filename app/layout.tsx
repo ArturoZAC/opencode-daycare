@@ -13,7 +13,10 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "OpenDayCare — Feed",
+  title: {
+    default: "OpenDayCare — Feed",
+    template: "%s — OpenDayCare",
+  },
   description: "Feed de la sala Soles",
 };
 

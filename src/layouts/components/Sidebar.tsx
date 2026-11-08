@@ -1,21 +1,8 @@
-import {
-  BellIcon,
-  HomeIcon,
-  LogoutIcon,
-  PlusIcon,
-  SunIcon,
-  UserIcon,
-  UsersIcon,
-} from "./Icons";
+import Link from "next/link";
+import { LogoutIcon, PlusIcon, SunIcon } from "@/src/components/Icons";
+import { NAV_ITEMS, type NavItem } from "../nav";
 
-const NAV_ITEMS = [
-  { label: "Feed", icon: HomeIcon, active: true },
-  { label: "Niños", icon: UsersIcon, active: false },
-  { label: "Avisos", icon: BellIcon, active: false },
-  { label: "Mi cuenta", icon: UserIcon, active: false },
-];
-
-export function Sidebar() {
+export function Sidebar({ activeItem }: { activeItem: NavItem }) {
   return (
     <aside className="hidden w-[248px] flex-none flex-col border-r border-line bg-card px-4 py-6 md:flex">
       <div className="flex items-center gap-[11px] px-2 pb-[22px] pt-1">
@@ -36,19 +23,25 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {NAV_ITEMS.map(({ label, icon: Icon, active }) => (
-          <div
-            key={label}
-            className={`flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] ${
-              active
-                ? "bg-coral-soft font-extrabold text-[#D9583C]"
-                : "font-semibold text-[#6E6359]"
-            }`}
-          >
-            <Icon />
-            {label}
-          </div>
-        ))}
+        {NAV_ITEMS.map(({ id, label, icon: Icon, href }) => {
+          const className = `flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] ${
+            id === activeItem
+              ? "bg-coral-soft font-extrabold text-[#D9583C]"
+              : "font-semibold text-[#6E6359]"
+          }`;
+
+          return href ? (
+            <Link key={id} href={href} className={className}>
+              <Icon />
+              {label}
+            </Link>
+          ) : (
+            <span key={id} className={className}>
+              <Icon />
+              {label}
+            </span>
+          );
+        })}
       </nav>
 
       <div className="mt-2.5 border-t border-line pt-3.5">
