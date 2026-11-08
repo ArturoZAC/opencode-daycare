@@ -2,10 +2,10 @@ import Link from "next/link";
 import {
   AlertIcon,
   ChevronLeftIcon,
-  PlusIcon,
   SunIcon,
 } from "@/src/components/Icons";
 import { CHILD_COLOR_STYLES, type Child, type Parent } from "./kids";
+import { LinkParentDialog } from "./LinkParentDialog";
 
 const PARENT_AVATAR_COLORS = ["bg-[#C9B6E8]", "bg-[#A9C7E8]"];
 
@@ -140,14 +140,7 @@ export function KidProfile({ child }: { child: Child }) {
                 </div>
               ))}
 
-              <div className="flex items-center gap-3 pt-0.5">
-                <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-[#B0A290]">
-                  <PlusIcon size={18} />
-                </span>
-                <span className="text-[14.5px] font-extrabold text-coral-deep">
-                  Vincular otro padre
-                </span>
-              </div>
+              <LinkParentDialog childName={child.name} />
             </div>
           </div>
         </div>

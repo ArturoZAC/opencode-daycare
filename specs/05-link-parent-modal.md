@@ -71,26 +71,26 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 
 ## Acceptance criteria
 
-- [ ] La fila "Vincular otro padre" es un botón y abre el modal en `/kids/mateo-fernandez`.
-- [ ] La fila se ve idéntica a antes de convertirla en botón.
-- [ ] El modal es un `<dialog>` con backdrop `rgba(63,54,46,.35)` y se cierra con la X y con Esc.
-- [ ] El header muestra "Vincular padre" y "a Mateo Fernández".
-- [ ] El banner azul muestra el copy completo y termina en "Solo verá el feed de Mateo."
-- [ ] En el perfil de Valentina el banner dice "Solo verá el feed de Valentina."
-- [ ] Nombre y email usan `Field` con `type="email"` en email y los placeholders del mockup.
-- [ ] Click en "NOMBRE DEL PADRE/MADRE" y en "EMAIL" enfoca su campo.
-- [ ] Parentesco arranca en Mamá con el estilo azul del mockup.
-- [ ] Papá y Tutor/a se seleccionan con click y con las flechas del teclado.
-- [ ] El código es `7K4P9` y debajo dice "Vence en 7 días".
-- [ ] Enviar vacío muestra "Ingresá el nombre del padre o la madre." y enfoca el nombre.
-- [ ] Email vacío muestra "Ingresá el email."; email `correo` muestra "Ingresá un email válido."
-- [ ] Escribir un nombre o email válido limpia su error sin reenviar.
-- [ ] Con nombre y email válidos el modal se cierra.
-- [ ] Al cerrar, la card "PADRES VINCULADOS" no cambia: no se agrega ningún padre.
-- [ ] Cerrar y reabrir resetea campos, parentesco a Mamá y errores.
-- [ ] A 390 px el modal no desborda, scrollea por dentro y no hay scroll horizontal.
-- [ ] `/`, `/kids`, los 8 perfiles y `/login` se ven igual que antes.
-- [ ] `package.json` no suma dependencias y `app/globals.css` no cambia.
+- [x] La fila "Vincular otro padre" es un botón y abre el modal en `/kids/mateo-fernandez`.
+- [x] La fila se ve idéntica a antes de convertirla en botón.
+- [x] El modal es un `<dialog>` con backdrop `rgba(63,54,46,.35)` y se cierra con la X y con Esc.
+- [x] El header muestra "Vincular padre" y "a Mateo Fernández".
+- [x] El banner azul muestra el copy completo y termina en "Solo verá el feed de Mateo."
+- [x] En el perfil de Valentina el banner dice "Solo verá el feed de Valentina."
+- [x] Nombre y email usan `Field` con `type="email"` en email y los placeholders del mockup.
+- [x] Click en "NOMBRE DEL PADRE/MADRE" y en "EMAIL" enfoca su campo.
+- [x] Parentesco arranca en Mamá con el estilo azul del mockup.
+- [x] Papá y Tutor/a se seleccionan con click y con las flechas del teclado.
+- [x] El código es `7K4P9` y debajo dice "Vence en 7 días".
+- [x] Enviar vacío muestra "Ingresá el nombre del padre o la madre." y enfoca el nombre.
+- [x] Email vacío muestra "Ingresá el email."; email `correo` muestra "Ingresá un email válido."
+- [x] Escribir un nombre o email válido limpia su error sin reenviar.
+- [x] Con nombre y email válidos el modal se cierra.
+- [x] Al cerrar, la card "PADRES VINCULADOS" no cambia: no se agrega ningún padre.
+- [x] Cerrar y reabrir resetea campos, parentesco a Mamá y errores.
+- [x] A 390 px el modal no desborda, scrollea por dentro y no hay scroll horizontal.
+- [x] `/`, `/kids`, los 8 perfiles y `/login` se ven igual que antes.
+- [x] `package.json` no suma dependencias y `app/globals.css` no cambia.
 
 ## Decisions
 
