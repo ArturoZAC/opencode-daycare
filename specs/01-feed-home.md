@@ -1,6 +1,6 @@
 # SPEC 01 — Feed como home
 
-> **Status:** Approved
+> **Status:** In review
 > **Depends on:** —
 > **Date:** 2026-11-07
 > **Objective:** Implementar `references/pantallas/feed.dc.html` como home `/`, con el mismo estilo visual, datos mock y navegación inerte.
@@ -17,7 +17,7 @@
 - Shell mobile (<768px): top bar + barra de navegación inferior fija; sidebar oculto.
 - Header del feed, composer "Compartí un momento…", separador "PUBLICADO HOY".
 - Tres post cards con los datos del mockup: logro, actividad con placeholder de foto, anuncio.
-- Datos mock tipados en `app/_data/posts.ts` y componentes en `app/_components/`.
+- Datos mock tipados en `src/data/posts.ts` y componentes en `src/components/`. `app/` queda solo para rutas y archivos de convención (`page`, `layout`, `loading`, etc.).
 
 **Out of scope (for future specs):**
 
@@ -30,7 +30,7 @@
 
 ## Data model
 
-Nuevo y único modelo, sin persistencia. Vive en `app/_data/posts.ts`.
+Nuevo y único modelo, sin persistencia. Vive en `src/data/posts.ts`.
 
 ```ts
 type PostKind = "achievement" | "activity" | "announcement";
@@ -82,12 +82,12 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 
 1. **`app/globals.css`** — dejar solo `@import "tailwindcss"` y los tokens de arriba en `@theme`. Eliminar el bloque `prefers-color-scheme: dark`, los tokens de Geist, la regla `body { ... }` y el `font-family: Arial`. No queda ninguna regla CSS propia. Verificar: el archivo no contiene selectores fuera de `@theme`.
 2. **`app/layout.tsx`** — `Fredoka` y `Nunito` con `variable: "--font-display"` / `"--font-sans"` y `subsets: ["latin"]`; `lang="es"`; metadata `OpenDayCare — Feed` / `Feed de la sala Soles`; `body` con `bg-cream text-ink font-sans antialiased`. Verificar: `document.body` computa Nunito.
-3. **`app/_components/icons.tsx`** — copiar los 12 SVG del mockup (sol, plus, casa, usuarios, campana, usuario, logout, cámara, corazón, mensaje, imagen, megáfono) como componentes con `size` y `className`; mismos `viewBox`, `stroke-width` y `fill` que el original. Verificar: compila sin errores de TS.
-4. **`app/_data/posts.ts`** — tipos y array `POSTS` con los tres posts, copy exacto del mockup.
-5. **`app/_components/sidebar.tsx`** — logo (sol + "OpenDayCare" / "Sala Soles"), CTA degradado coral con plus, los cuatro items de nav (`Feed` activo: fondo `coral-soft` / texto `coral`, resto `#6E6359`), footer con avatar "C", "Caro Giménez", "Maestra · Soles" y botón de logout. Todo inerte (`<div>`/`<span>`, sin `href`). Montarlo en `page.tsx` con `hidden md:flex`. Verificar: sidebar idéntico al screenshot, main vacío.
-6. **`app/_components/post-card.tsx`** — render por `kind`: avatar (inicial o megáfono), título, hora + autor, pill de badge, audiencia, cuerpo `15.5px/1.55`, placeholder de foto si hay `photoLabel`, footer con corazón + likes, mensaje + comentarios y "Editar". Verificar: las tres variantes.
+3. **`src/components/icons.tsx`** — copiar los 12 SVG del mockup (sol, plus, casa, usuarios, campana, usuario, logout, cámara, corazón, mensaje, imagen, megáfono) como componentes con `size` y `className`; mismos `viewBox`, `stroke-width` y `fill` que el original. Verificar: compila sin errores de TS.
+4. **`src/data/posts.ts`** — tipos y array `POSTS` con los tres posts, copy exacto del mockup.
+5. **`src/components/sidebar.tsx`** — logo (sol + "OpenDayCare" / "Sala Soles"), CTA degradado coral con plus, los cuatro items de nav (`Feed` activo: fondo `coral-soft` / texto `coral`, resto `#6E6359`), footer con avatar "C", "Caro Giménez", "Maestra · Soles" y botón de logout. Todo inerte (`<div>`/`<span>`, sin `href`). Montarlo en `page.tsx` con `hidden md:flex`. Verificar: sidebar idéntico al screenshot, main vacío.
+6. **`src/components/post-card.tsx`** — render por `kind`: avatar (inicial o megáfono), título, hora + autor, pill de badge, audiencia, cuerpo `15.5px/1.55`, placeholder de foto si hay `photoLabel`, footer con corazón + likes, mensaje + comentarios y "Editar". Verificar: las tres variantes.
 7. **`app/page.tsx`** — shell `flex min-h-dvh bg-cream md:h-dvh md:overflow-hidden`, main `md:h-dvh md:overflow-y-auto` con el scrollbar del mockup resuelto en clases: `[&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-thumb]:border-[3px] [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-[#E4D6C4] [&::-webkit-scrollbar-thumb]:bg-clip-content`, contenedor `mx-auto max-w-[760px] px-5 pt-6 pb-28 md:px-10 md:pt-[34px] md:pb-20`. Dentro: header (eyebrow, "Buenas, Caro", "12 niños · martes 17 jun"), composer, separador, `POSTS.map(<PostCard />)`. Verificar contra `references/screenshots/feed.png` a 920px y 1440px.
-8. **`app/_components/mobile-nav.tsx`** — top bar (`md:hidden`): logo compacto a la izquierda; a la derecha botón coral 38px con plus y avatar "C" de 34px. Barra inferior fija (`md:hidden`), fondo `card`, borde superior, cuatro items con icono + label, activo en coral, `pb-[env(safe-area-inset-bottom)]`. Verificar a 390px: sin scroll horizontal y sidebar oculto.
+8. **`src/components/mobile-nav.tsx`** — top bar (`md:hidden`): logo compacto a la izquierda; a la derecha botón coral 38px con plus y avatar "C" de 34px. Barra inferior fija (`md:hidden`), fondo `card`, borde superior, cuatro items con icono + label, activo en coral, `pb-[env(safe-area-inset-bottom)]`. Verificar a 390px: sin scroll horizontal y sidebar oculto.
 
 ## Acceptance criteria
 
@@ -114,7 +114,9 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 - **Sí:** `next/font/google` en lugar de `<link>` al CDN, y en lugar de Geist. Sin FOUT ni requests externos en runtime.
 - **Sí:** tokens en `@theme` porque vienen once pantallas más del mismo sistema visual.
 - **Sí:** SVG inline propios en `icons.tsx`. Cero dependencias y control exacto de `stroke-width` (el mockup usa 1.7, 2, 2.2 y 2.4 según el icono).
-- **Sí:** datos mock en `app/_data/posts.ts`. Editar contenido = editar el array.
+- **Sí:** `src/` para todo el código que no es ruta (`src/components`, `src/data`). `app/` conserva solo `page.tsx`, `layout.tsx`, `globals.css` y futuros `loading`/`error`. Sin prefijos `_`.
+- **No:** cambiar el alias `@/*` (`./*`). Los imports usan `@/src/components/...` y `@/src/data/posts`.
+- **Sí:** datos mock en `src/data/posts.ts`. Editar contenido = editar el array.
 - **Sí:** enlaces inertes (`<span>`/`<div>` sin `href`). No se crean rutas placeholder ni se habilitan 404.
 - **Sí:** mobile con top bar + barra inferior, sin drawer. No necesita estado de cliente.
 - **Sí:** tamaños en px exactos del mockup (`text-[15.5px]`, `text-[12.5px]`, `rounded-[20px]`) donde la escala de Tailwind redondearía y se perdería la identidad.
