@@ -1,19 +1,21 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { Field, fieldControlClass, fieldLabelClass } from "@/src/components/Field";
-import { ChevronDownIcon, PlusIcon } from "@/src/components/Icons";
+import { PlusIcon } from "@/src/components/Icons";
 import { DateField } from "./DateField";
+import { SelectField } from "./SelectField";
 import {
   ageFromIso,
   formatBirthDate,
-  isoFromTypedDate,
   monthYear,
   parseAllergyTags,
   slugify,
   type Child,
 } from "./kids";
 import { addChild, nextChildColor, uniqueSlug } from "./kidsStore";
+
+const ROOMS = ["Soles", "Lunas", "Estrellas", "Arcoíris"];
 
 const NAME_ERROR = "Ingresá el nombre completo.";
 const BIRTH_DATE_REQUIRED = "Ingresá la fecha de nacimiento.";
@@ -41,6 +43,31 @@ function todayIso() {
   return `${today.getFullYear()}-${month}-${day}`;
 }
 
+function todayTyped() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${day}/${month}/${today.getFullYear()}`;
+}
+
+function isoFromTypedDate(typed: string): string | null {
+  const digits = typed.replace(/\D/g, "");
+  if (digits.length !== 8) return null;
+
+  const day = Number(digits.slice(0, 2));
+  const month = Number(digits.slice(2, 4));
+  const year = Number(digits.slice(4, 8));
+
+  if (year < 1900 || year > 2100) return null;
+  if (month < 1 || month > 12) return null;
+  
+  const daysInMonth = new Date(year, month, 0).getDate();
+  if (day < 1 || day > daysInMonth) return null;
+
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 export function AddChildDialog({
   onAdded,
 }: {
@@ -56,6 +83,13 @@ export function AddChildDialog({
   const [allergies, setAllergies] = useState("");
   const [allergyNote, setAllergyNote] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  const [today, setToday] = useState("");
+  const [maxDate, setMaxDate] = useState("");
+
+  useEffect(() => {
+    setToday(todayIso());
+    setMaxDate(todayTyped());
+  }, []);
 
   function resetForm() {
     setName("");
@@ -65,6 +99,23 @@ export function AddChildDialog({
     setAllergyNote("");
     setErrors({});
   }
+
+  // Validación en tiempo real: limpia errores cuando los valores se vuelven válidos.
+  useEffect(() => {
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (next.name && name.trim()) {
+        delete next.name;
+      }
+      if (next.birthDate && birthDate) {
+        const iso = isoFromTypedDate(birthDate);
+        if (iso && (!today || iso <= today)) {
+          delete next.birthDate;
+        }
+      }
+      return next;
+    });
+  }, [name, birthDate, today]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,7 +132,7 @@ export function AddChildDialog({
       nextErrors.birthDate = BIRTH_DATE_REQUIRED;
     } else if (!iso) {
       nextErrors.birthDate = BIRTH_DATE_INVALID;
-    } else if (iso > todayIso()) {
+    } else if (today && iso > today) {
       nextErrors.birthDate = BIRTH_DATE_FUTURE;
     }
 
@@ -122,7 +173,7 @@ export function AddChildDialog({
       <button
         type="button"
         onClick={() => dialogRef.current?.showModal()}
-        className="flex flex-none items-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-cta"
+        className="flex cursor-pointer flex-none items-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-cta"
       >
         <PlusIcon size={17} />
         Agregar niño
@@ -139,7 +190,7 @@ export function AddChildDialog({
             <button
               type="button"
               onClick={() => dialogRef.current?.close()}
-              className="text-[15px] font-bold text-muted"
+              className="cursor-pointer text-[15px] font-bold text-muted"
             >
               Cancelar
             </button>
@@ -151,7 +202,7 @@ export function AddChildDialog({
             </span>
             <button
               type="submit"
-              className="text-[15px] font-extrabold text-coral-deep"
+              className="cursor-pointer text-[15px] font-extrabold text-coral-deep"
             >
               Guardar
             </button>
@@ -178,31 +229,26 @@ export function AddChildDialog({
               </p>
             ) : null}
 
-            <DateField
-              id="child-birth-date"
-              ref={birthDateRef}
-              label={<RequiredLabel>FECHA DE NACIMIENTO</RequiredLabel>}
-              value={birthDate}
-              onChange={setBirthDate}
-              error={errors.birthDate}
-            />
+            <div className="flex gap-3.5">
+              <DateField
+                id="child-birth-date"
+                ref={birthDateRef}
+                label={<RequiredLabel>FECHA DE NACIMIENTO</RequiredLabel>}
+                value={birthDate}
+                onChange={setBirthDate}
+                error={errors.birthDate}
+                max={maxDate || undefined}
+                className="flex-1 mb-[18px]"
+              />
 
-            <div className="mb-[18px]">
-              <label htmlFor="child-room" className={fieldLabelClass}>
-                <RequiredLabel>SALA</RequiredLabel>
-              </label>
-              <div className="relative">
-                <select
+              <div className="flex-1 mb-[18px]">
+                <SelectField
                   id="child-room"
+                  label={<RequiredLabel>SALA</RequiredLabel>}
                   value={room}
-                  onChange={(event) => setRoom(event.target.value)}
-                  className={`${fieldControlClass} appearance-none pr-11 font-bold`}
-                >
-                  <option value="Soles">Soles</option>
-                </select>
-                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#B0A290]">
-                  <ChevronDownIcon />
-                </span>
+                  onChange={setRoom}
+                  options={ROOMS}
+                />
               </div>
             </div>
 

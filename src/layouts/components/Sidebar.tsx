@@ -5,7 +5,7 @@ import { NAV_ITEMS, type NavItem } from "../nav";
 export function Sidebar({ activeItem }: { activeItem: NavItem }) {
   return (
     <aside className="hidden w-[248px] flex-none flex-col border-r border-line bg-card px-4 py-6 md:flex">
-      <div className="flex items-center gap-[11px] px-2 pb-[22px] pt-1">
+      <div className="flex cursor-pointer items-center gap-[11px] px-2 pb-[22px] pt-1">
         <div className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-xl bg-[linear-gradient(155deg,#F8C3A8,#F2937A)]">
           <SunIcon />
         </div>
@@ -17,7 +17,7 @@ export function Sidebar({ activeItem }: { activeItem: NavItem }) {
         </div>
       </div>
 
-      <div className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] p-3 text-[14.5px] font-extrabold text-white shadow-cta">
+      <div className="mb-[18px] flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] p-3 text-[14.5px] font-extrabold text-white shadow-cta">
         <PlusIcon size={17} />
         Nueva publicación
       </div>
@@ -55,7 +55,7 @@ export function Sidebar({ activeItem }: { activeItem: NavItem }) {
           </div>
           <span
             title="Cerrar sesión"
-            className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-cream text-muted"
+            className="flex h-8 w-8 cursor-pointer flex-none items-center justify-center rounded-[10px] bg-cream text-muted"
           >
             <LogoutIcon />
           </span>

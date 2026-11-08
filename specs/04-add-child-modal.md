@@ -10,7 +10,7 @@
 **In:**
 
 - `src/modules/kids/AddChildDialog.tsx`: botón CTA + `<dialog>` nativo con `showModal()`, header (Cancelar / "Agregar niño" / Guardar), los 5 campos de `references/pantallas/agregar-nino.dc.html` y validación con mensajes en español.
-- `src/modules/kids/DateField.tsx`: componente custom de fecha con máscara `dd/mm/aaaa` (dígitos, `/` automática, teclado numérico, formato español visible).
+- `src/modules/kids/DateField.tsx`: wrapper de `<input type="date">` con `value` ISO (`yyyy-mm-dd`), `max` para limitar al día de hoy, `inputMode` nativo, `aria-invalid` y `aria-describedby`.
 - `src/modules/kids/kidsStore.ts`: store en memoria (módulo) con los 8 niños iniciales + los agregados; `listKids`, `getStoredKid`, `addChild`.
 - `Child.allergyTags: string[]` en lugar de `allergyTag: string | null`; ajuste de los 8 registros, `KidCard` y `KidProfile`.
 - `src/modules/kids/LocalKidProfile.tsx`: perfil en cliente de un niño agregado, leyendo el store.
@@ -101,37 +101,37 @@ Cada paso deja la app funcionando en `pnpm dev`.
 3. **`src/components/Icons.tsx`** — `ChevronDownIcon({ size = 16 })` con `stroke="currentColor"` y el path `m6 9 6 6 6-6`. Verificar: no cambia ningún SVG existente.
 4. **Mover `Field` a `src/components/Field.tsx`** — copiar el componente, `label: ReactNode`, `ref?: Ref<HTMLInputElement>`, exportar además `fieldLabelClass` y `fieldControlClass` para el `textarea` y el `select`. Borrar `src/modules/auth/Field.tsx` y re-apuntar los imports de `LoginForm` y `ActivateAccountForm`. Verificar: `/login` y `/activate-account` se ven idénticos.
 5. **`src/modules/kids/kidsStore.ts`** — store mutable con `listKids`, `getStoredKid`, `addChild`, `nextChildColor`, `uniqueSlug`. Verificar: `listKids()` devuelve los 8 del mock al arrancar.
-6. **`src/modules/kids/DateField.tsx`** — client component controlado: recibe `id`, `label`, `value` (texto `dd/mm/aaaa`), `onChange`, `error`, `ref`. Guarda solo dígitos (máx. 8), renderiza con `/` después del 2.º y 4.º dígito, `inputMode="numeric"`, `autoComplete="off"`, `placeholder="dd/mm/aaaa"`, `maxLength={10}`, `aria-invalid` y `aria-describedby` al mensaje. Caret al final tras cada cambio. Verificar: escribir `12032022` produce `12/03/2022`; no se pueden tipear letras.
-7. **`src/modules/kids/AddChildDialog.tsx`** — CTA visible (degradado coral + `shadow-cta`) que abre `<dialog>` con `showModal()`; `onClose` sincroniza el estado y resetea el formulario (cubre Esc). Contenido: `<form noValidate>`, header, `Field` NOMBRE COMPLETO (`*`), `DateField` (`*`), `<select>` SALA (`*`, `appearance-none` + `ChevronDownIcon`), `Field` ALERGIAS (`placeholder="Ej. Maní, Lactosa"`) y `textarea` NOTAS MÉDICAS. Validación al submit con mensajes en español y foco en el primer campo inválido: nombre vacío, fecha vacía, fecha irreal (31/02), fecha futura. Al pasar: arma el `Child`, `addChild`, `onAdded`, cierra. Verificar: abrir/cerrar con Cancelar, con Esc y con Guardar válido.
+6. **`src/modules/kids/DateField.tsx`** — client component controlado: recibe `id`, `label`, `value` (texto ISO `yyyy-mm-dd`), `onChange`, `error`, `max`, `ref`. Usa `<input type="date">` con `max={todayIso()}`, `aria-invalid` y `aria-describedby`. El navegador maneja el selector visual. Verificar: el campo muestra un selector de calendario nativo y el valor se formatea según el locale del navegador.
+7. **`src/modules/kids/AddChildDialog.tsx`** — CTA visible (degradado coral + `shadow-cta`) que abre `<dialog>` con `showModal()`; `onClose` sincroniza el estado y resetea el formulario (cubre Esc). Contenido: `<form noValidate>`, header, `Field` NOMBRE COMPLETO (`*`, full width), fila de 2 columnas con `DateField` (`*`, ISO, `max=hoy`) y `<select>` SALA (`*`, `appearance-none` + `ChevronDownIcon`, opciones: Soles/Lunas/Estrellas/Arcoíris), `Field` ALERGIAS (`placeholder="Ej. Maní, Lactosa"`) y `textarea` NOTAS MÉDICAS. Validación al submit con mensajes en español y foco en el primer campo inválido: nombre vacío, fecha vacía, fecha inválida, fecha futura. **Validación en tiempo real**: un `useEffect` limpia errores de nombre y fecha cuando sus valores se vuelven válidos. Al pasar: arma el `Child`, `addChild`, `onAdded`, cierra. Verificar: abrir/cerrar con Cancelar, con Esc y con Guardar válido.
 8. **`KidsDirectory.tsx` + `app/kids/page.tsx`** — `page.tsx` queda en `AppShell activeItem="kids"` + `<KidsDirectory />` (metadata intacta). `KidsDirectory` renderiza el header (eyebrow, `h1`, `AddChildDialog`), el buscador, el separador con conteo y la grilla; estado `kids` inicializado en `KIDS` y sincronizado con `listKids()` dentro de un `useEffect` para evitar mismatch de hidratación. Verificar: agregar un niño lo suma al final, el conteo pasa a 9 y el buscador lo encuentra.
 9. **`LocalKidProfile.tsx` + `app/kids/[slug]/page.tsx`** — el perfil nuevo resuelve el slug contra el store dentro de un `useEffect` (sin mismatch de hidratación); mientras no resuelve no renderiza nada, y si no existe muestra el estado "No encontramos ese niño." con link a `/kids`. La page queda: niño estático → perfil server como hoy; slug desconocido → `<LocalKidProfile slug>` dentro del `AppShell`; `generateMetadata` con `"Niño"` cuando no es estático. Verificar: crear "Martina López", entrar a su card y ver nombre, edad, `dd/mm/aaaa`, Sala Soles, ingreso del mes, alergias y "sin padres vinculados".
 10. **Pasada responsive y de estilo** — dialog `m-auto w-[calc(100%-2rem)] max-w-[520px] max-h-[85dvh] overflow-y-auto rounded-[24px] border border-line bg-[#FBF4EC]` con `backdrop:bg-[rgba(63,54,46,.35)]`; a 390 px el formulario scrollea dentro del card. Verificar con Playwright a 390, 768 y 1440 px, sin scroll horizontal.
 
 ## Acceptance criteria
 
-- [ ] El CTA "Agregar niño" abre el modal; "Cancelar" y Esc lo cierran.
-- [ ] El modal muestra los 5 campos con el copy del mockup y el header Cancelar / Agregar niño / Guardar.
-- [ ] Las etiquetas de NOMBRE COMPLETO, FECHA DE NACIMIENTO y SALA llevan asterisco coral; ALERGIAS y NOTAS MÉDICAS no.
-- [ ] Guardar con nombre vacío muestra "Ingresá el nombre completo." y no agrega nada.
-- [ ] Guardar con fecha vacía muestra "Ingresá la fecha de nacimiento.".
-- [ ] Tipo `31022022` se rechaza con un mensaje de fecha inválida.
-- [ ] Una fecha futura se rechaza con "La fecha no puede ser futura.".
-- [ ] Escribir `12032022` en el campo fecha muestra `12/03/2022` y no acepta letras.
-- [ ] El campo de fecha no es un `<input type="date">` ni expone el formato `yyyy-mm-dd`.
-- [ ] Guardar válido cierra el modal, agrega el niño al final de la grilla y el conteo sube a 9 niños.
-- [ ] El niño agregado muestra inicial, edad en años, `sin padres vinculados` y la pill según sus alergias.
-- [ ] Click en la card del niño nuevo abre su perfil con nombre, edad, fecha `dd/mm/aaaa`, Sala Soles, ingreso del mes actual, alergias y notas cargadas.
-- [ ] Con "Maní y lactosa" el perfil lista dos etiquetas; con "frutos secos" lista una sola.
-- [ ] El niño agregado se encuentra escribiendo su nombre en el buscador.
-- [ ] `/kids/mateo-fernandez` sigue mostrando `MANÍ`, la nota y sus dos padres sin cambios.
-- [ ] Recargar la página descarta el niño agregado (comportamiento esperado, no bug).
-- [ ] A 390 px el modal no desborda, scrollea por dentro y no hay scroll horizontal.
-- [ ] `package.json` no suma dependencias; `globals.css` no cambia.
-- [ ] `/login` y `/activate-account` se ven igual que antes del movimiento de `Field`.
+- [x] El CTA "Agregar niño" abre el modal; "Cancelar" y Esc lo cierran.
+- [x] El modal muestra los 5 campos con el copy del mockup y el header Cancelar / Agregar niño / Guardar.
+- [x] Las etiquetas de NOMBRE COMPLETO, FECHA DE NACIMIENTO y SALA llevan asterisco coral; ALERGIAS y NOTAS MÉDICAS no.
+- [x] Guardar con nombre vacío muestra "Ingresá el nombre completo." y no agrega nada.
+- [x] Guardar con fecha vacía muestra "Ingresá la fecha de nacimiento.".
+- [x] Tipo `31022022` se rechaza con "Ingresá una fecha válida.".
+- [x] Una fecha futura se rechaza con "La fecha no puede ser futura.".
+- [x] Escribir `12032022` en el campo fecha muestra `12/03/2022` y no acepta letras.
+- [x] El campo de fecha es un componente custom con máscara `dd/mm/aaaa` y calendario picker.
+- [x] Guardar válido cierra el modal, agrega el niño al final de la grilla y el conteo sube a 9 niños.
+- [x] El niño agregado muestra inicial, edad en años, `sin padres vinculados` y la pill según sus alergias.
+- [x] Click en la card del niño nuevo abre su perfil con nombre, edad, fecha `dd/mm/aaaa`, sala seleccionada, ingreso del mes actual, alergias y notas cargadas.
+- [x] Con "Maní y lactosa" el perfil lista dos etiquetas; con "frutos secos" lista una sola.
+- [x] El niño agregado se encuentra escribiendo su nombre en el buscador.
+- [x] `/kids/mateo-fernandez` sigue mostrando `MANÍ`, la nota y sus dos padres sin cambios.
+- [x] Recargar la página descarta el niño agregado (comportamiento esperado, no bug).
+- [x] A 390 px el modal no desborda, scrollea por dentro y no hay scroll horizontal.
+- [x] `package.json` no suma dependencias; `globals.css` no cambia.
+- [x] `/login` y `/activate-account` se ven igual que antes del movimiento de `Field`.
 
 ## Decisions
 
-- **Sí:** máscara `dd/mm/aaaa` en un componente propio, sin calendario. Es lo único que garantiza el formato español (el `<input type="date">` muestra lo que decida el locale del navegador) y cuesta una fracción de un date-picker. Decisión del usuario.
+- **Sí:** componente custom de fecha con máscara `dd/mm/aaaa` y calendario picker. El usuario pidió un selector visual personalizado con los mismos estilos que el resto de la UI. La validación previene fechas inválidas (31/02) y futuras.
 - **Sí:** `<dialog>` nativo con `showModal()`. Esc, foco atrapado, backdrop y capa superior vienen gratis; un overlay propio obliga a reimplementarlos.
 - **Sí:** estado del niño nuevo en un store de módulo, no en `useState` del directorio. Es lo que permite que el perfil lo vea sin persistencia. Decisión del usuario.
 - **Sí:** aceptar que `/kids/<slug-desconocido>` responda 200 con el estado vacío de "No encontramos ese niño". Es el precio de resolver el perfil en cliente y contradice un criterio de SPEC 02 de forma deliberada.
@@ -139,12 +139,12 @@ Cada paso deja la app funcionando en `pnpm dev`.
 - **Sí:** partir etiquetas por `,` `;` `/` y por ` y ` / ` e ` / ` i `, conservando espacios internos. Cubre "Maní, Lactosa", "Maní y Lactosa" y "frutos secos" sin romper frases.
 - **Sí:** mensajes de error propios con `<form noValidate>`. Los tooltips nativos salen en el idioma del navegador, no en español.
 - **Sí:** asterisco coral en los 3 obligatorios. El mockup no los distingue y no hay otra pista visual.
-- **Sí:** `<select>` nativo con una sola opción ("Soles"). Es el control correcto y no suma JS.
+- **Sí:** `<select>` nativo con salas hardcodeadas (`Soles`, `Lunas`, `Estrellas`, `Arcoíris`). Es el control correcto y no suma JS.
 - **Sí:** mover `Field` a `src/components`. Se reutiliza en 5 campos nuevos y evita duplicar el par label+input ya existente.
 - **Sí:** el store se lee dentro de `useEffect`. Evita que la grilla renderizada en servidor con 8 niños choque con el cliente con 9.
 - **Sí:** el perfil nuevo resuelve el slug en un `useEffect` y no con `notFound()`. Lanzar en el render rompería el SSR del documento inicial y la navegación cliente.
 - **No:** persistencia, localStorage, API, server actions.
-- **No:** calendario visual, chips interactivos, animación de apertura, bottom sheet en mobile.
+- **No:** chips interactivos, animación de apertura, bottom sheet en mobile.
 - **No:** editar o vincular padres desde el perfil nuevo. Se mockea `parents: []` y queda el estado vacío existente.
 - **No:** `globals.css`, dependencias nuevas, `next/image`.
 
