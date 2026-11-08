@@ -130,31 +130,31 @@ El nombre accesible es el texto visible, así que no lleva `ariaLabel`. El ícon
 
 ## Acceptance criteria
 
-- [ ] El CTA "Nueva publicación" del sidebar abre el modal en `/` y en `/kids`, y se ve idéntico a antes.
-- [ ] El `+` de la top bar mobile abre el mismo modal a 390px y desaparece a 768px.
-- [ ] Click en cualquier parte del composer "Compartí un momento…" abre el modal.
-- [ ] El composer se ve idéntico a antes (avatar, texto, botón coral de cámara) y no cambia el layout del feed.
-- [ ] El modal es un `<dialog>` con backdrop `rgba(63,54,46,.35)` y se cierra con Cancelar y con Esc.
-- [ ] El header muestra "Cancelar", "Nueva publicación" y "Publicar".
-- [ ] PARA muestra los 8 niños de la sala, Mateo seleccionado, y "Toda la sala" como último chip.
-- [ ] Los chips de niños son checkboxes: se pueden marcar y desmarcar varios a la vez.
-- [ ] Al activar "Toda la sala" solo ese chip queda oscuro y los 8 chips de niños quedan apagados.
-- [ ] Al tocar un niño con "Toda la sala" activa, solo ese niño queda seleccionado y "Toda la sala" se apaga.
-- [ ] Un niño agregado desde `/kids` aparece en PARA al abrir el modal sin recargar.
-- [ ] TIPO muestra Comida, Siesta, Actividad, Logro, Ánimo, Foto y Anuncio con las paletas del mockup.
-- [ ] Actividad arranca seleccionada con el ring oscuro y solo puede haber un tipo a la vez.
-- [ ] Las flechas del teclado mueven la selección de TIPO.
-- [ ] DESCRIPCIÓN arranca vacía con el placeholder "Contá cómo le fue hoy…".
-- [ ] "Agregar" abre el picker de imágenes y acepta varias a la vez.
-- [ ] Cada foto elegida aparece como preview de 96×96 con su X, y la X la quita.
-- [ ] Publicar sin descripción muestra "Contá algo sobre el día." y no navega.
-- [ ] Publicar sin audiencia muestra "Elegí al menos un destinatario." y no navega.
-- [ ] Publicar con audiencia y descripción cierra el modal y vuelve a `/`.
-- [ ] El feed sigue mostrando los 3 posts de `POSTS`: no se agrega ninguna publicación.
-- [ ] Cerrar y reabrir resetea audiencia a Mateo, tipo a Actividad, descripción vacía, fotos vacías y errores.
-- [ ] A 390px el modal scrollea por dentro y no hay scroll horizontal.
-- [ ] `/`, `/kids` y `/login` se ven igual que antes.
-- [ ] `package.json` no suma dependencias, `app/globals.css` no cambia y `posts.ts` queda intacto.
+- [x] El CTA "Nueva publicación" del sidebar abre el modal en `/` y en `/kids`, y se ve idéntico a antes.
+- [x] El `+` de la top bar mobile abre el mismo modal a 390px y desaparece a 768px.
+- [x] Click en cualquier parte del composer "Compartí un momento…" abre el modal.
+- [x] El composer se ve idéntico a antes (avatar, texto, botón coral de cámara) y no cambia el layout del feed.
+- [x] El modal es un `<dialog>` con backdrop `rgba(63,54,46,.35)` y se cierra con Cancelar y con Esc.
+- [x] El header muestra "Cancelar", "Nueva publicación" y "Publicar".
+- [x] PARA muestra los 8 niños de la sala, Mateo seleccionado, y "Toda la sala" como último chip.
+- [x] Los chips de niños son checkboxes: se pueden marcar y desmarcar varios a la vez.
+- [x] Al activar "Toda la sala" solo ese chip queda oscuro y los 8 chips de niños quedan apagados.
+- [x] Al tocar un niño con "Toda la sala" activa, solo ese niño queda seleccionado y "Toda la sala" se apaga.
+- [x] Un niño agregado desde `/kids` aparece en PARA al abrir el modal sin recargar.
+- [x] TIPO muestra Comida, Siesta, Actividad, Logro, Ánimo, Foto y Anuncio con las paletas del mockup.
+- [x] Actividad arranca seleccionada con el ring oscuro y solo puede haber un tipo a la vez.
+- [x] Las flechas del teclado mueven la selección de TIPO.
+- [x] DESCRIPCIÓN arranca vacía con el placeholder "Contá cómo le fue hoy…".
+- [x] "Agregar" abre el picker de imágenes y acepta varias a la vez.
+- [x] Cada foto elegida aparece como preview de 96×96 con su X, y la X la quita.
+- [x] Publicar sin descripción muestra "Contá algo sobre el día." y no navega.
+- [x] Publicar sin audiencia muestra "Elegí al menos un destinatario." y no navega.
+- [x] Publicar con audiencia y descripción cierra el modal y vuelve a `/`.
+- [x] El feed sigue mostrando los 3 posts de `POSTS`: no se agrega ninguna publicación.
+- [x] Cerrar y reabrir resetea audiencia a Mateo, tipo a Actividad, descripción vacía, fotos vacías y errores.
+- [x] A 390px el modal scrollea por dentro y no hay scroll horizontal.
+- [x] `/`, `/kids` y `/login` se ven igual que antes.
+- [x] `package.json` no suma dependencias, `app/globals.css` no cambia y `posts.ts` queda intacto.
 
 ## Decisions
 
