@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { Field } from "@/src/components/Field";
+import { login } from "./actions";
 
 export function LoginForm() {
   return (
-    <>
+    <form action={login}>
       <h1 className="mb-1.5 font-display text-[30px] font-semibold text-ink">
         Iniciar sesión
       </h1>
       <p className="mb-7 text-[15px] text-muted">Ingresá para ver el día de hoy.</p>
 
-      <Field id="email" label="EMAIL" type="email" autoComplete="email" />
+      <Field id="email" name="email" label="EMAIL" type="email" autoComplete="email" />
       <Field
         id="password"
+        name="password"
         label="CONTRASEÑA"
         type="password"
         autoComplete="current-password"
@@ -25,7 +27,7 @@ export function LoginForm() {
       </div>
 
       <button
-        type="button"
+        type="submit"
         className="w-full rounded-[15px] bg-[linear-gradient(180deg,#F4977E,#EE8164)] py-[15px] text-[16px] font-extrabold text-white shadow-cta"
       >
         Iniciar sesión
@@ -37,6 +39,6 @@ export function LoginForm() {
           Activá tu cuenta
         </Link>
       </p>
-    </>
+    </form>
   );
 }
