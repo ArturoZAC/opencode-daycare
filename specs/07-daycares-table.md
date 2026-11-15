@@ -9,10 +9,9 @@
 
 **In:**
 
-- Migración `create_daycares_table` aplicada con la herramienta `apply_migration` del MCP de Supabase sobre el proyecto `diiwyrzhrufrwuoqrrqd`: `CREATE TABLE` con `id`, `name`, `address`, `created_at`, `updated_at` + `ENABLE ROW LEVEL SECURITY` + las 4 policies del profesor (`daycares_read`, `daycares_insert`, `daycares_update`, `daycares_delete`).
-- Migración `seed_daycares`: 5 `INSERT` de `name` + `address`, con el `id` generado por el default.
+- Una única migración `create_daycares_table_and_seed`, versionada en `supabase/migrations/001_create_daycares_table_and_seed.sql` y aplicada con la herramienta `apply_migration` del MCP de Supabase sobre el proyecto `diiwyrzhrufrwuoqrrqd`: `CREATE TABLE` con `id`, `name`, `address`, `created_at`, `updated_at` + `ENABLE ROW LEVEL SECURITY` + las 4 policies del profesor (`daycares_read`, `daycares_insert`, `daycares_update`, `daycares_delete`) + 5 `INSERT` de `name` + `address`, con el `id` generado por el default.
 - Verificación del esquema, RLS/policies, filas sembradas, historial de migraciones y advisors post-aplicación.
-- Con este spec queda fundado el patrón que heredan los specs de DB futuros: cada migración se versiona en `supabase/migrations/NNN_nombre.sql` (numeración del curso) y se aplica vía `apply_migration` con el contenido exacto de ese archivo.
+- Con este spec queda fundado el patrón que heredan los specs de DB futuros: cada migración se versiona en `supabase/migrations/NNN_nombre.sql` y se aplica vía `apply_migration` con el contenido exacto de ese archivo. (Corrección post-implementación, pedido explícito del usuario: spec07 terminó en **un único archivo** con DDL + policies + seed, no dos.)
 
 **Out of scope (for future specs):**
 
@@ -23,7 +22,7 @@
 
 ## Data model
 
-La tabla aterriza en `public` (search_path default de Supabase); se usa el SQL del profesor sin prefijo. Migración 1, `create_daycares_table` (copiado del plan del curso):
+La tabla aterriza en `public` (search_path default de Supabase); se usa el SQL del profesor sin prefijo. Un único archivo `001_create_daycares_table_and_seed.sql` (corregido tras la implementación: antes eran dos migraciones), con el SQL del plan del curso. DDL + RLS + policies:
 
 ```sql
 CREATE TABLE daycares (
@@ -55,7 +54,7 @@ CREATE POLICY "daycares_delete" ON daycares
   USING (false);
 ```
 
-Migración 2, `seed_daycares`. No se insertan ids: los genera el default `gen_random_uuid()`:
+Seed, en el mismo archivo. No se insertan ids: los genera el default `gen_random_uuid()`:
 
 ```sql
 INSERT INTO daycares (name, address) VALUES
@@ -70,33 +69,34 @@ INSERT INTO daycares (name, address) VALUES
 
 ## Implementation plan
 
-Cada paso deja el proyecto funcional. El repo suma exactamente dos archivos: las migraciones `.sql`.
+Cada paso deja el proyecto funcional. El repo suma exactamente un archivo: la migración `.sql` (DDL + policies + seed juntos).
 
 1. **Pre-chequeo** — `execute_sql`: `select 1 from information_schema.tables where table_schema = 'public' and table_name = 'daycares'`. Si devuelve fila, abortar y reportar (alguien creó la tabla fuera de banda).
-2. **Migración 1** — crear `supabase/migrations/001_create_daycares_table.sql` con el SQL completo de la migración 1 del Data model (tabla + RLS + 4 policies) y aplicarlo vía `apply_migration` con `name: "create_daycares_table"` y el contenido exacto del archivo.
+2. **Migración** — crear `supabase/migrations/001_create_daycares_table_and_seed.sql` con el SQL completo del Data model (tabla + RLS + 4 policies + 5 `INSERT`) y aplicarlo vía `apply_migration` con el contenido exacto del archivo. *(Aplicado originalmente como dos migraciones —`create_daycares_table` + `seed_daycares`— por la versión previa del plan; el historial remoto conserva ambas.)*
 3. **Verificar esquema** — `execute_sql` sobre `information_schema.columns`: 5 columnas con tipos, defaults y nullabilidad exactos; PK en `id`.
 4. **Verificar RLS y policies** — `execute_sql` sobre `pg_policies`: `relrowsecurity` true y exactamente 4 policies llamadas `daycares_read` (SELECT, `USING (true)`), `daycares_insert` (INSERT, `WITH CHECK (false)`), `daycares_update` (UPDATE) y `daycares_delete` (DELETE).
-5. **Migración 2** — crear `supabase/migrations/002_seed_daycares.sql` con los 5 `INSERT` y aplicarlo vía `apply_migration` con `name: "seed_daycares"`. Verificar `select count(*) from daycares` = 5 y que exista una fila con `name = 'Guardería Sala Soles'`.
-6. **Verificar historial** — `list_migrations` muestra `create_daycares_table` y `seed_daycares` en ese orden.
+5. **Verificar seed** — `select count(*) from daycares` = 5 y que exista una fila con `name = 'Guardería Sala Soles'`, todas con `id` generado por el default.
+6. **Verificar historial** — `list_migrations` muestra las migraciones aplicadas en orden.
 7. **Advisors** — `get_advisors`: ninguna crítica nueva atribuible a `daycares` más allá de lo esperado.
 
 ## Acceptance criteria
 
-- [ ] `public.daycares` existe en el proyecto `diiwyrzhrufrwuoqrrqd`.
-- [ ] `id` es `uuid` PK con default `gen_random_uuid()`.
-- [ ] `name` es `text NOT NULL`; `address` es `text` nullable.
-- [ ] `created_at` y `updated_at` son `timestamptz NOT NULL` con default `now()`.
-- [ ] RLS está activado en `daycares`.
-- [ ] Existen exactamente 4 policies con los nombres y expresiones de la Migración 1.
-- [ ] `daycares` tiene 5 filas; una es "Guardería Sala Soles" y todas tienen `id` generado por `gen_random_uuid()`.
-- [ ] `list_migrations` incluye `create_daycares_table` y `seed_daycares`.
-- [ ] `supabase/migrations/001_create_daycares_table.sql` y `002_seed_daycares.sql` existen en el repo con el SQL exacto aplicado al proyecto.
-- [ ] El repo no tiene otros cambios: `app/`, `src/` y `package.json` quedan intactos.
-- [ ] `/`, `/kids` y `/login` se renderizan igual que antes (la app mock no lee la DB).
+- [x] `public.daycares` existe en el proyecto `diiwyrzhrufrwuoqrrqd`.
+- [x] `id` es `uuid` PK con default `gen_random_uuid()`.
+- [x] `name` es `text NOT NULL`; `address` es `text` nullable.
+- [x] `created_at` y `updated_at` son `timestamptz NOT NULL` con default `now()`.
+- [x] RLS está activado en `daycares`.
+- [x] Existen exactamente 4 policies con los nombres y expresiones de la migración.
+- [x] `daycares` tiene 5 filas; una es "Guardería Sala Soles" y todas tienen `id` generado por `gen_random_uuid()`.
+- [x] `list_migrations` incluye las migraciones de `daycares` aplicadas.
+- [x] `supabase/migrations/001_create_daycares_table_and_seed.sql` existe en el repo (único archivo) con el SQL exacto aplicado al proyecto.
+- [x] El repo no tiene otros cambios: `app/`, `src/` y `package.json` quedan intactos.
+- [x] `/`, `/kids` y `/login` se renderizan igual que antes (la app mock no lee la DB).
 
 ## Decisions
 
-- **Sí:** replicar el SQL del plan del profesor (`001_create_daycares_table.sql`) literal, incluyendo `address`, `updated_at` en `daycares` y las 4 policies. Reemplaza la decisión previa de "RLS sin policies". Instrucción explícita del usuario.
+- **Sí:** un solo archivo `.sql` en el repo, DDL + policies + seed juntos, con su migración propia. Instrucción explícita del usuario tras la implementación (reemplaza las dos migraciones separadas del plan original; el historial remoto conserva `create_daycares_table` + `seed_daycares`).
+- **Sí:** replicar el SQL del plan del profesor literal, incluyendo `address`, `updated_at` en `daycares` y las 4 policies. Reemplaza la decisión previa de "RLS sin policies". Instrucción explícita del usuario.
 - **Sí:** `apply_migration` vía MCP como patrón de aplicación, con nombres alineados a los archivos del curso (`create_daycares_table`, `seed_daycares`).
 - **Sí:** cada migración se versiona en `supabase/migrations/NNN_nombre.sql` con la numeración del profesor (`001_`, `002_`, …) y el mismo contenido que se aplica. El repo es la fuente de verdad del esquema; el historial del proyecto es el registro de qué se aplicó. Instrucción explícita del usuario.
 - **Sí:** 5 registros seed en su propia migración. Pedido explícito del usuario. Nombres: "Guardería Sala Soles" (el de la UI) + 4 inventados; intercambiables antes de aprobar.
