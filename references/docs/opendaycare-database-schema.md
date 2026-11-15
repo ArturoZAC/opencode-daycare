@@ -86,7 +86,7 @@ Niños inscritos en la guardería.
 | Campo                       | Tipo                     | Notas                                            |
 | --------------------------- | ------------------------ | ------------------------------------------------ |
 | `id`                        | `uuid` PK                |                                                  |
-| `room_id`                   | `uuid` FK → `rooms`      | Nullable.                                        |
+| `room_id`                   | `uuid` FK → `rooms`      |                                                  |
 | `full_name`                 | `text`                   |                                                  |
 | `birth_date`                | `date`                   | Fecha de nacimiento.                             |
 | `enrolled_at`               | `date`                   | Fecha de ingreso a la guardería.                 |
