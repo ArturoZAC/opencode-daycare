@@ -33,7 +33,9 @@ export const createClient = async (request: NextRequest) => {
 
   // Refresca el token si venció y escribe las cookies en la respuesta.
   // Sin este getClaims() la sesión nunca se renueva y el usuario se desconecta.
-  await supabase.auth.getClaims();
+  // getClaims() valida el JWT localmente: sirve también como optimistic check en proxy.ts.
+  // Sin sesión (o JWT inválido) Supabase devuelve data: null, no claims: null.
+  const { data } = await supabase.auth.getClaims();
 
-  return supabaseResponse;
+  return { supabaseResponse, isAnonymous: !data?.claims };
 };

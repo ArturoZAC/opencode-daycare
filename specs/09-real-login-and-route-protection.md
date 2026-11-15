@@ -14,10 +14,11 @@
 - `app/(auth)/login/page.tsx`: leer `searchParams` (`PageProps<"/login">`) y mostrar "Email o contraseña incorrectos." cuando `error=1`.
 - `proxy.ts`: lógica de redirect sobre el resultado de `getClaims()` que ya se obtiene en `utils/supabase/middleware.ts` (optimistic check, sin queries a la BD, patrón de la guía de authentication de Next 16).
 - `src/layouts/components/Sidebar.tsx`: el `<span>` de "Cerrar sesión" pasa a `<button type="submit">` dentro de `<form action={logout}>`.
+- `src/modules/auth/currentUser.ts` (`getCurrentUser()`) + `src/layouts/components/SidebarUser.tsx`: el bloque de usuario del sidebar deja de ser mock y muestra nombre, inicial y rol del usuario autenticado, leyendo `public.users` (policy `users_read`). El bloque va bajo `<Suspense>` porque lee `cookies()` y con `cacheComponents` eso no puede bloquear el prerender del shell.
 
 **Out of scope (for future specs):**
 
-- Consumir la sesión en la UI: nombre/avatar reales en el sidebar (hoy "Caro Giménez" mock), roles y permisos.
+- Roles y permisos en la UI (gating por rol, `/familia`), avatar real (URL) y foto de perfil.
 - Datos reales: feed, kids y posts siguen mock; no se lee `public.users` ni se aplica RLS desde la app.
 - Recuperación de contraseña, registro, activación real de invitaciones.
 - `utils/supabase/client.ts` (browser client): queda intacto, sin consumidor.
@@ -49,6 +50,7 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 3. **Banner de error en `/login`** — page pasa a `async` con `{ searchParams }: PageProps<"/login">`; si `(await searchParams).error === "1"`, renderizar el copy exacto. Sin `'use client'`. Verificar: credenciales malas muestran el mensaje en `/login`; el resto de la pantalla no cambia.
 4. **Protección en `proxy.ts`** — `createClient` de `utils/supabase/middleware.ts` devuelve `supabaseResponse` con las cookies refrescadas y además el resultado de `getClaims()`; reescribir la firma para exponer `isAnonymous`. En `proxy.ts`: anónimo en ruta no-public → `NextResponse.redirect("/login")`; autenticado en `publicRoutes` → redirect `/`. En ambos casos copiar las cookies de `supabaseResponse` a la respuesta del redirect (si no, se pierde el refresh y la sesión se cae). Verificar: en ventana sin sesión, `/` y `/kids` responden 307 a `/login`; `/login` con sesión responde 307 a `/`.
 5. **Logout del Sidebar** — agregar `logout()` a `actions.ts`; en `src/layouts/components/Sidebar.tsx` envolver el botón en `<form action={logout}>` y cambiar el `<span>` por `<button type="submit">` (mismas clases). Verificar: click → `/login`, y `/kids` vuelve a estar bloqueado.
+6. **Usuario real en el sidebar** — `src/modules/auth/currentUser.ts` con `getCurrentUser()`: `createClient(await cookies())` + `getClaims()` → si no hay claims devuelve `null`; si hay, `.from("users").select("full_name, role").eq("id", claims.sub).single()` y mapea el rol a label. `src/layouts/components/SidebarUser.tsx` reemplaza el bloque mock de `Sidebar.tsx` (inicial, nombre, rol, botón de logout) y queda envuelto en `<Suspense fallback={skeleton}>`. Verificar: logueado, el sidebar muestra "Arturo" + "Staff"; sin `blocking-prerender` en consola; `/` y `/kids` siguen instantáneos.
 
 ## Acceptance criteria
 
@@ -62,6 +64,7 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 - [ ] Ningún archivo nuevo usa `'use client'`; `LoginForm`, la page y `Sidebar` siguen server components.
 - [ ] `package.json` y `.env*` no cambian: las deps y las keys ya existen.
 - [ ] `/` y `/kids` se ven idénticos a SPEC 01/02 salvo el botón de logout ahora funcional.
+- [ ] El sidebar muestra el nombre real del usuario autenticado (`Arturo`) y su rol (`Staff`), no el mock "Caro Giménez".
 - [ ] Ningún nombre de cookie de Supabase ni secrets hardcoded en el código de la app.
 
 ## Decisions
@@ -72,7 +75,8 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 - **Sí:** copiar cookies refrescadas a toda respuesta de redirect en el proxy. Documentado en el design doc de `@supabase/ssr`: si ocurre un refresh y la respuesta es un redirect sin esas cookies, el refresh token queda invalidado del lado del browser.
 - **Sí:** error de login vía `?error=1`. Cero client JS; `/login` ya es dinámica al leer `searchParams`, igual que `/kids/[slug]` con `params`. **No:** `useActionState`: requiere `'use client'` por una sola línea de feedback.
 - **No:** redirección por rol (staff → feed, parent → `/familia`): los roles no se consumen en UI todavía; sale con los datos reales.
-- **No:** reemplazar "Caro Giménez" por el usuario real de la sesión: es la misma familia de cambios que leer `public.users`, va en otro spec.
+- **Sí:** nombre y rol reales en el sidebar leyendo `public.users` (nombre, no avatar por URL): es una query de una fila cubierta por `users_read`, y completa el "quién soy" del shell sin abrir la puerta a datos de otras personas. **No:** leer toda la tabla ni permisos por rol.
+- **Sí:** el bloque de usuario va bajo `<Suspense>`: lee `cookies()`, y con `cacheComponents` una lectura de request sin boundary tumba el prerender del shell (`blocking-prerender-runtime`), igual que ya resuelve `/kids/[slug]` con `instant = false`. **No:** `instant = false` en el layout — apagaría la instantaneidad de todas las rutas.
 - **No:** borrar el `try/catch` con comentario de `server.ts`: cubre exactamente el caso "server component lee y el client quiere setear cookies".
 
 ## Risks
@@ -87,7 +91,7 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 
 ## What is **not** in this spec
 
-- Sesión consumida en la UI (nombre, avatar, rol), `/familia`, permisos por rol.
+- Permisos por rol, `/familia`, avatar real por URL.
 - Datos reales desde Supabase (feed, posts, children) y policies más allá de SPEC 08.
 - Recuperación de contraseña, signup, activación real de invitaciones.
 - Logout en `MobileNav` y gestión avanzada de sesiones (revocación, expiración custom).

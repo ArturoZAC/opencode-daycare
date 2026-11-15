@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { LogoutIcon, PlusIcon, SunIcon } from "@/src/components/Icons";
+import { PlusIcon, SunIcon } from "@/src/components/Icons";
 import { CreatePostDialog } from "@/src/modules/feed/CreatePostDialog";
 import { NAV_ITEMS, type NavItem } from "../nav";
+import { SidebarUser } from "./SidebarUser";
 
 export function Sidebar({ activeItem }: { activeItem: NavItem }) {
   return (
@@ -46,21 +47,7 @@ export function Sidebar({ activeItem }: { activeItem: NavItem }) {
       </nav>
 
       <div className="mt-2.5 border-t border-line pt-3.5">
-        <div className="flex items-center gap-[11px] px-2 py-1.5">
-          <div className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-[#F2937A] font-display text-base font-semibold text-white">
-            C
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-sm font-extrabold text-ink">Caro Giménez</div>
-            <div className="text-xs text-muted-2">Maestra · Soles</div>
-          </div>
-          <span
-            title="Cerrar sesión"
-            className="flex h-8 w-8 cursor-pointer flex-none items-center justify-center rounded-[10px] bg-cream text-muted"
-          >
-            <LogoutIcon />
-          </span>
-        </div>
+        <SidebarUser />
       </div>
     </aside>
   );
