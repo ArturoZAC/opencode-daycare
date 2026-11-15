@@ -1,6 +1,6 @@
 # SPEC 10 — Tablas rooms/children y niños reales
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 02, SPEC 04, SPEC 08, SPEC 09
 > **Date:** 2026-11-15
 > **Objective:** Crear `rooms` y `children` (con el ENUM `child_status` y la columna `slug`) en el proyecto Supabase con sus policies y el seed de las 4 salas, y conectar `/kids`, el modal "Agregar niño" y `/kids/[slug]` a esos datos reales, eliminando los mocks.
@@ -176,24 +176,24 @@ Cada paso deja la app funcionando en `pnpm dev` (http://localhost:3000).
 
 ## Acceptance criteria
 
-- [ ] `public.rooms` y `public.children` existen; el ENUM `child_status` tiene `active` y `archived`.
-- [ ] `children` tiene las 12 columnas del Data model con tipos, defaults y nullabilidad exactos; `slug` es `text NOT NULL UNIQUE`.
-- [ ] RLS está activo en ambas tablas con exactamente 4 policies cada una: `rooms_read`/`children_read`/`children_insert` con el chequeo staff+guardería, y `rooms_insert`/`rooms_update`/`rooms_delete`/`children_update`/`children_delete` en `false`.
-- [ ] `rooms` tiene exactamente 4 filas (Soles, Lunas, Estrellas, Arcoíris) de "Guardería Sala Soles"; `children` tiene 0 filas.
-- [ ] `supabase/migrations/003_create_rooms_and_children.sql` existe, coincide con lo aplicado y `list_migrations` lo registra.
-- [ ] `/kids` sin niños reales muestra "Todavía no hay niños. Agregá el primero." y no aparece ningún niño del mock.
-- [ ] El select SALA del modal lista Soles, Lunas, Estrellas y Arcoíris leídas de `rooms`.
-- [ ] Guardar "Martina López / 12/03/2022 / Soles" cierra el modal y la card aparece bajo SALA SOLES con "1 niño".
-- [ ] F5 en `/kids` conserva a Martina: el dato vive en la DB, no en memoria.
-- [ ] Una segunda "Martina López" crea el slug `martina-lopez-2` y las dos cards conviven.
-- [ ] Un niño agregado en Lunas aparece bajo SALA LUNAS y no bajo Soles.
-- [ ] `/kids/martina-lopez` muestra nombre, "0 años · Sala Soles", `12 mar 2022`, Sala Soles, ingreso del mes actual y las alergias en mayúsculas.
-- [ ] La card PADRES VINCULADOS muestra su estado vacío y "Vincular otro padre" abre el modal de SPEC 05 sin escribir en la DB.
-- [ ] `/kids/mateo-fernandez` responde 404 (el mock ya no existe).
-- [ ] El buscador sigue filtrando ~250 ms después de la última tecla y oculta las salas sin coincidencias.
-- [ ] Guardar con nombre vacío o fecha inválida no llama al action y muestra los mismos mensajes de SPEC 04.
-- [ ] `package.json` y `app/globals.css` no cambian; `KidCard`, `KidProfile`, `LinkParentDialog`, `DateField` y `SelectField` no se editan.
-- [ ] `/`, `/login` y el sidebar se ven igual que antes.
+- [x] `public.rooms` y `public.children` existen; el ENUM `child_status` tiene `active` y `archived`.
+- [x] `children` tiene las 12 columnas del Data model con tipos, defaults y nullabilidad exactos; `slug` es `text NOT NULL UNIQUE`.
+- [x] RLS está activo en ambas tablas con exactamente 4 policies cada una: `rooms_read`/`children_read`/`children_insert` con el chequeo staff+guardería, y `rooms_insert`/`rooms_update`/`rooms_delete`/`children_update`/`children_delete` en `false`.
+- [x] `rooms` tiene exactamente 4 filas (Soles, Lunas, Estrellas, Arcoíris) de "Guardería Sala Soles"; `children` tiene 0 filas.
+- [x] `supabase/migrations/003_create_rooms_and_children.sql` existe, coincide con lo aplicado y `list_migrations` lo registra.
+- [x] `/kids` sin niños reales muestra "Todavía no hay niños. Agregá el primero." y no aparece ningún niño del mock.
+- [x] El select SALA del modal lista Soles, Lunas, Estrellas y Arcoíris leídas de `rooms`.
+- [x] Guardar "Martina López / 12/03/2022 / Soles" cierra el modal y la card aparece bajo SALA SOLES con "1 niño".
+- [x] F5 en `/kids` conserva a Martina: el dato vive en la DB, no en memoria.
+- [x] Una segunda "Martina López" crea el slug `martina-lopez-2` y las dos cards conviven.
+- [x] Un niño agregado en Lunas aparece bajo SALA LUNAS y no bajo Soles.
+- [x] `/kids/martina-lopez` muestra nombre, "0 años · Sala Soles", `12 mar 2022`, Sala Soles, ingreso del mes actual y las alergias en mayúsculas.
+- [x] La card PADRES VINCULADOS muestra su estado vacío y "Vincular otro padre" abre el modal de SPEC 05 sin escribir en la DB.
+- [x] `/kids/mateo-fernandez` responde 404 (el mock ya no existe).
+- [x] El buscador sigue filtrando ~250 ms después de la última tecla y oculta las salas sin coincidencias.
+- [x] Guardar con nombre vacío o fecha inválida no llama al action y muestra los mismos mensajes de SPEC 04.
+- [x] `package.json` y `app/globals.css` no cambian; `KidCard`, `KidProfile`, `LinkParentDialog`, `DateField` y `SelectField` no se editan.
+- [x] `/`, `/login` y el sidebar se ven igual que antes.
 
 ## Decisions
 

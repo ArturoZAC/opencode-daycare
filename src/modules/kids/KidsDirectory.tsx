@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { SearchIcon } from "@/src/components/Icons";
 import { AddChildDialog } from "./AddChildDialog";
 import { KidCard } from "./KidCard";
-import { KIDS, type Child } from "./kids";
-import { listKids } from "./kidsStore";
+import type { KidSection } from "./queries";
 
 function normalizeText(value: string) {
   return value
@@ -14,14 +13,9 @@ function normalizeText(value: string) {
     .toLowerCase();
 }
 
-export function KidsDirectory() {
-  const [kids, setKids] = useState<Child[]>(KIDS);
+export function KidsDirectory({ sections }: { sections: KidSection[] }) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-
-  useEffect(() => {
-    setKids(listKids());
-  }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedQuery(query), 250);
@@ -29,13 +23,20 @@ export function KidsDirectory() {
   }, [query]);
 
   const normalizedQuery = normalizeText(debouncedQuery.trim());
-  const visibleKids = normalizedQuery
-    ? kids.filter((kid) => normalizeText(kid.name).includes(normalizedQuery))
-    : kids;
-
-  function handleChildAdded(child: Child) {
-    setKids((currentKids) => [...currentKids, child]);
-  }
+  const totalKids = sections.reduce(
+    (total, section) => total + section.kids.length,
+    0,
+  );
+  const visibleSections = sections
+    .map((section) => ({
+      ...section,
+      kids: normalizedQuery
+        ? section.kids.filter((kid) =>
+            normalizeText(kid.name).includes(normalizedQuery),
+          )
+        : section.kids,
+    }))
+    .filter((section) => section.kids.length > 0);
 
   return (
     <>
@@ -48,7 +49,7 @@ export function KidsDirectory() {
             Niños
           </h1>
         </div>
-        <AddChildDialog onAdded={handleChildAdded} />
+        <AddChildDialog rooms={sections.map((section) => section.name)} />
       </div>
 
       <div className="mb-[22px] flex items-center gap-[11px] rounded-[14px] border border-line bg-card px-4 py-3">
@@ -64,26 +65,35 @@ export function KidsDirectory() {
         />
       </div>
 
-      <div className="mb-3.5 flex items-center gap-3">
-        <span className="text-[12.5px] font-extrabold tracking-[.8px] text-ink">
-          SALA SOLES
-        </span>
-        <span aria-live="polite" className="text-[13px] text-muted-2">
-          {visibleKids.length} {visibleKids.length === 1 ? "niño" : "niños"}
-        </span>
-        <span className="h-px flex-1 bg-[#E7DAC8]" />
-      </div>
-
-      {visibleKids.length === 0 ? (
+      {totalKids === 0 ? (
+        <p className="py-8 text-center text-[14.5px] text-muted-2">
+          Todavía no hay niños. Agregá el primero.
+        </p>
+      ) : visibleSections.length === 0 ? (
         <p className="py-8 text-center text-[14.5px] text-muted-2">
           No encontramos niños con ese nombre.
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-2">
-          {visibleKids.map((child) => (
-            <KidCard key={child.slug} child={child} />
-          ))}
-        </div>
+        visibleSections.map((section) => (
+          <section key={section.id} className="mb-6 last:mb-0">
+            <div className="mb-3.5 flex items-center gap-3">
+              <span className="text-[12.5px] font-extrabold tracking-[.8px] text-ink">
+                SALA {section.name.toUpperCase()}
+              </span>
+              <span aria-live="polite" className="text-[13px] text-muted-2">
+                {section.kids.length}{" "}
+                {section.kids.length === 1 ? "niño" : "niños"}
+              </span>
+              <span className="h-px flex-1 bg-[#E7DAC8]" />
+            </div>
+
+            <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-2">
+              {section.kids.map((child) => (
+                <KidCard key={child.slug} child={child} />
+              ))}
+            </div>
+          </section>
+        ))
       )}
     </>
   );

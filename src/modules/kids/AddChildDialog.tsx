@@ -1,21 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Field, fieldControlClass, fieldLabelClass } from "@/src/components/Field";
 import { PlusIcon } from "@/src/components/Icons";
+import { createChild } from "./actions";
 import { DateField } from "./DateField";
 import { SelectField } from "./SelectField";
-import {
-  ageFromIso,
-  formatBirthDate,
-  monthYear,
-  parseAllergyTags,
-  slugify,
-  type Child,
-} from "./kids";
-import { addChild, nextChildColor, uniqueSlug } from "./kidsStore";
-
-const ROOMS = ["Soles", "Lunas", "Estrellas", "Arcoíris"];
+import { parseAllergyTags } from "./kids";
 
 const NAME_ERROR = "Ingresá el nombre completo.";
 const BIRTH_DATE_REQUIRED = "Ingresá la fecha de nacimiento.";
@@ -68,21 +66,19 @@ function isoFromTypedDate(typed: string): string | null {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-export function AddChildDialog({
-  onAdded,
-}: {
-  onAdded: (child: Child) => void;
-}) {
+export function AddChildDialog({ rooms }: { rooms: string[] }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const birthDateRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
-  const [room, setRoom] = useState("Soles");
+  const [room, setRoom] = useState(rooms[0] ?? "");
   const [allergies, setAllergies] = useState("");
   const [allergyNote, setAllergyNote] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const [today, setToday] = useState("");
   const [maxDate, setMaxDate] = useState("");
 
@@ -94,10 +90,11 @@ export function AddChildDialog({
   function resetForm() {
     setName("");
     setBirthDate("");
-    setRoom("Soles");
+    setRoom(rooms[0] ?? "");
     setAllergies("");
     setAllergyNote("");
     setErrors({});
+    setFormError(null);
   }
 
   // Validación en tiempo real: limpia errores cuando los valores se vuelven válidos.
@@ -148,24 +145,24 @@ export function AddChildDialog({
       return;
     }
 
-    const now = new Date();
-    const child: Child = {
-      slug: uniqueSlug(slugify(trimmedName)),
-      name: trimmedName,
-      initial: trimmedName.charAt(0).toUpperCase(),
-      color: nextChildColor(),
-      ageYears: ageFromIso(iso, now),
-      birthDate: formatBirthDate(iso),
-      room,
-      joinedAt: monthYear(now),
-      allergyTags: parseAllergyTags(allergies),
-      allergyNote: allergyNote.trim() || null,
-      parents: [],
-    };
+    setFormError(null);
 
-    addChild(child);
-    onAdded(child);
-    dialogRef.current?.close();
+    startTransition(async () => {
+      const result = await createChild({
+        fullName: trimmedName,
+        birthDate: iso,
+        roomName: room,
+        allergyTags: parseAllergyTags(allergies),
+        medicalNotes: allergyNote,
+      });
+
+      if (!result.ok) {
+        setFormError(result.message);
+        return;
+      }
+
+      dialogRef.current?.close();
+    });
   }
 
   return (
@@ -202,13 +199,23 @@ export function AddChildDialog({
             </span>
             <button
               type="submit"
-              className="cursor-pointer text-[15px] font-extrabold text-coral-deep"
+              disabled={isPending}
+              className="cursor-pointer text-[15px] font-extrabold text-coral-deep disabled:cursor-default disabled:opacity-60"
             >
               Guardar
             </button>
           </div>
 
           <div className="px-[26px] py-6">
+            {formError ? (
+              <p
+                role="alert"
+                className="mb-[18px] rounded-[14px] bg-[#FBDAD6] px-4 py-3 text-[13px] font-bold text-[#C5413A]"
+              >
+                {formError}
+              </p>
+            ) : null}
+
             <Field
               id="child-name"
               ref={nameRef}
@@ -247,7 +254,7 @@ export function AddChildDialog({
                   label={<RequiredLabel>SALA</RequiredLabel>}
                   value={room}
                   onChange={setRoom}
-                  options={ROOMS}
+                  options={rooms}
                 />
               </div>
             </div>

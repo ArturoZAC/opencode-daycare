@@ -4,8 +4,8 @@ import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent, t
 import { useRouter } from "next/navigation";
 import { fieldControlClass, fieldLabelClass } from "@/src/components/Field";
 import { CloseIcon, PlusIcon } from "@/src/components/Icons";
-import { CHILD_COLOR_STYLES, KIDS } from "@/src/modules/kids/kids";
-import { listKids } from "@/src/modules/kids/kidsStore";
+import { CHILD_COLOR_STYLES, type Child } from "@/src/modules/kids/kids";
+import { listKidsForAudience } from "@/src/modules/kids/actions";
 
 type PostType =
   | "food"
@@ -42,10 +42,12 @@ const POST_TYPES: { value: PostType; label: string; className: string }[] = [
   { value: "announcement", label: "Anuncio", className: "bg-[#CCD8F4] text-[#4E72C8]" },
 ];
 
-const DEFAULT_AUDIENCE: AudienceSelection = {
-  allRoom: false,
-  kidSlugs: [KIDS[0].slug],
-};
+function defaultAudience(loadedKids: Child[]): AudienceSelection {
+  return {
+    allRoom: false,
+    kidSlugs: loadedKids.length > 0 ? [loadedKids[0].slug] : [],
+  };
+}
 
 const AUDIENCE_ERROR = "Elegí al menos un destinatario.";
 const DESCRIPTION_ERROR = "Contá algo sobre el día.";
@@ -76,21 +78,26 @@ export function CreatePostDialog({
   const descriptionErrorId = useId();
   const photosInputId = useId();
 
-  const [kids, setKids] = useState(KIDS);
-  const [audience, setAudience] = useState<AudienceSelection>(DEFAULT_AUDIENCE);
+  const [kids, setKids] = useState<Child[]>([]);
+  const [audience, setAudience] = useState<AudienceSelection>(() =>
+    defaultAudience([]),
+  );
   const [postType, setPostType] = useState<PostType>("activity");
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState<PhotoDraft[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
 
   function open() {
-    setKids(listKids());
     dialogRef.current?.showModal();
+    listKidsForAudience().then((loadedKids) => {
+      setKids(loadedKids);
+      setAudience(defaultAudience(loadedKids));
+    });
   }
 
   function resetForm() {
     photos.forEach((photo) => URL.revokeObjectURL(photo.url));
-    setAudience(DEFAULT_AUDIENCE);
+    setAudience(defaultAudience(kids));
     setPostType("activity");
     setDescription("");
     setPhotos([]);
